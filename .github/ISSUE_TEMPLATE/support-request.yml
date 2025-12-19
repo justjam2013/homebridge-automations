@@ -45,7 +45,7 @@ body:
       label: Plugin Config
       render: JSON
       description: |
-        If relevant to your bug report, please include your Virtual Accessories For Homebridge config (`config.json`).
+        If relevant to your bug report, please include your Automations For Homebridge config (`config.json`).
 
         * If you're unsure if the config is relevant, please include it.
         * Be sure to **remove any sensitive information (passwords, tokens, etc.).**
