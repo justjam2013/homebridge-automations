@@ -1,22 +1,28 @@
 {
-  "name": "homebridge-plugin-name",
-  "displayName": "Plugin Name",
+  "name": "homebridge-automations",
+  "displayName": "Homebridge Automations",
   "type": "module",
   "version": "1.0.0",
-  "private": true,
-  "description": "A short description about what your plugin does.",
-  "author": "Your Name",
-  "license": "Apache-2.0",
-  "homepage": "https://github.com/USERNAME/GITHUB_PROJECT_NAME#readme",
+  "description": "Automations for Homebridge.",
+  "author": "justjam2013",
+  "license": "MIT",
+  "funding": [
+    {
+      "type": "kofi",
+      "url": "https://ko-fi.com/justjam2013"
+    }
+  ],
+  "homepage": "https://github.com/justjam2013/homebridge-automations#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/USERNAME/GITHUB_PROJECT_NAME.git"
+    "url": "https://github.com/justjam2013/homebridge-automations.git"
   },
   "bugs": {
-    "url": "https://github.com/USERNAME/GITHUB_PROJECT_NAME/issues"
+    "url": "https://github.com/justjam2013/homebridge-automations/issues"
   },
   "keywords": [
-    "homebridge-plugin"
+    "homebridge-plugin",
+    "automations"
   ],
   "main": "dist/index.js",
   "engines": {
@@ -30,13 +36,16 @@
     "watch": "npm run build && npm link && nodemon"
   },
   "dependencies": {
-    "homebridge-lib": "^7.1.12"
+    "@homebridge/hap-client": "^3.1.1",
+    "homebridge-lib": "^7.1.12",
+    "reflect-metadata": "^0.2.2",
+    "typeserializer": "^0.2.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
-    "@types/node": "^24.10.1",
+    "@types/node": "^25.0.2",
     "eslint": "^9.39.1",
-    "homebridge": "^2.0.0-beta.55",
+    "homebridge": "^2.0.0-beta.64",
     "nodemon": "^3.1.11",
     "rimraf": "^6.1.0",
     "ts-node": "^10.9.2",

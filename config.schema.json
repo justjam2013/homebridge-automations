@@ -1,17 +1,198 @@
 {
-  "pluginAlias": "ExampleHomebridgePlugin",
+  "pluginAlias": "HomebridgeAutomations",
   "pluginType": "platform",
   "singular": true,
-  "strictValidation": false,
+  "strictValidation": true,
   "schema": {
     "type": "object",
-    "required": ["name"],
-    "additionalProperties": false,
+    "$defs": {
+      "accessory": {
+        "type": "object",
+        "properties": {
+          "accessoryName": {
+            "title": "Accessory Name",
+            "type": "string",
+            "placeholder": "Porch Light"
+          },
+          "accessoryType": {
+            "title": "Accessory Type",
+            "type": "string",
+            "oneOf": [
+              { "title": "Light", "enum": ["light"] },
+              { "title": "Outlet", "enum": ["outlet"] },
+              { "title": "Switch", "enum": ["switch"] }
+            ]
+          },
+          "property": {
+            "title": "Property",
+            "type": "string",
+            "oneOf": [
+              { "title": "Power", "enum": ["power"] },
+              { "title": "Mute", "enum": ["mute"] }
+            ]
+          },
+          "value": {
+            "title": "Value",
+            "type": "string",
+            "oneOf": [
+              { "title": "On", "enum": ["on"] },
+              { "title": "Off", "enum": ["off"] }
+            ]
+          }
+        }
+      },
+      "time": {
+        "type": "object",
+        "properties": {
+          "hour": {
+            "title": "Hour *",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 23
+          },
+          "minutes": {
+            "title": "Minutes *",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 59
+          }
+        }
+      }
+    },
     "properties": {
       "name": {
-        "title": "Name",
+        "title": "Platform Name",
         "type": "string",
-        "default": "Example Dynamic Platform"
+        "required": true,
+        "default": "Homebridge Automations",
+        "readonly": true
+      },
+      "automations": {
+        "title": "Automations",
+        "type": "array",
+        "orderable": true,
+        "items": {
+          "title": " {{ value.automationName || 'New Automation' }}",
+          "type": "object",
+          "expandable": true,
+          "expanded": false,
+          "uniqueItemProperties": [ "automationName" ],
+          "properties": {
+            "automationName": {
+              "title": "Automation Name",
+              "type": "string",
+              "required": true
+            },
+            "trigger": {
+              "title": "Trigger",
+              "type": "object",
+              "expandable": true,
+              "expanded": false,
+              "properties": {
+                "event": {
+                  "title": "Event",
+                  "type": "string",
+                  "oneOf": [
+                    { "title": "A Time of Day Occurs", "enum": ["time"] },
+                    { "title": "An Accessory is Controlled", "enum": ["accessory"] },
+                    { "title": "A Sensor Detects Something", "enum": ["sensor"] }
+                  ]
+                },
+                "when": {
+                  "title": "When",
+                  "type": "string",
+                  "oneOf": [
+                    { "title": "Sunset", "enum": ["sunset"] },
+                    { "title": "Sunrise", "enum": ["sunset"] },
+                    { "title": "Time of Day", "enum": ["time"] }
+                  ],
+                  "condition": {
+                    "functionBody": "return model.automations[arrayIndices].trigger && model.automations[arrayIndices].trigger.event && model.automations[arrayIndices].trigger.event === 'time';"
+                  }
+                },
+                "repeat": {
+                  "title": "Repeat",
+                  "type": "array",
+                  "uniqueItems": true,
+                  "items": {
+                    "type": "string",
+                    "title": "Option",
+                    "enum": [
+                      "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
+                    ]
+                  },
+                  "condition": {
+                    "functionBody": "return model.automations[arrayIndices].trigger && model.automations[arrayIndices].trigger.event === 'time';"
+                  }
+                }
+              }
+            },
+            "actions": {
+              "title": "Actions",
+              "type": "object",
+              "expandable": true,
+              "expanded": false,
+              "properties": {
+                "$ref": "#/$defs/accessory/properties"
+              }
+            },
+            "conditions": {
+              "title": "Conditions",
+              "type": "object",
+              "expandable": true,
+              "expanded": false,
+              "properties": {
+                "type": {
+                  "title": "Type",
+                  "type": "string",
+                  "required": true,
+                  "oneOf": [
+                    { "title": "Time", "enum": ["time"] },
+                    { "title": "Accessory", "enum": ["accesswory"] },
+                    { "title": "Sensor", "enum": ["sensor"] }
+                  ]
+                }
+              }
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "automationName": { "minLength": 1 }
+                }
+              },
+              "then": {
+                "required": [ "trigger", "actions" ],
+                "properties": {
+                  "actions": {
+                    "required": [ "accessoryName", "accessoryType", "property", "value" ]
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "trigger": {
+                    "properties": {
+                      "event": { "const": "time" }
+                    },
+                    "required": [ "event" ]
+                  }
+                },
+                "required": [ "trigger" ]
+              },
+              "then": {
+                "properties": {
+                  "trigger": {
+                    "required": [ "event", "when", "repeat" ]
+                  }
+                }
+              }
+            }
+          ]
+        }
       }
     }
   }
