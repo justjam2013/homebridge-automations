@@ -41,6 +41,41 @@
           }
         }
       },
+      "sensor": {
+        "type": "object",
+        "properties": {
+          "sensorName": {
+            "title": "Sensor Name",
+            "type": "string",
+            "placeholder": "Front Door Sensor"
+          },
+          "sensorType": {
+            "title": "Sensor Type",
+            "type": "string",
+            "oneOf": [
+              { "title": "Contact", "enum": ["contact"] },
+              { "title": "Motion", "enum": ["motion"] },
+              { "title": "Occupancy", "enum": ["occupancy"] }
+            ]
+          },
+          "property": {
+            "title": "Property",
+            "type": "string",
+            "oneOf": [
+              { "title": "Power", "enum": ["power"] },
+              { "title": "Mute", "enum": ["mute"] }
+            ]
+          },
+          "value": {
+            "title": "Value",
+            "type": "string",
+            "oneOf": [
+              { "title": "On", "enum": ["on"] },
+              { "title": "Off", "enum": ["off"] }
+            ]
+          }
+        }
+      },
       "time": {
         "type": "object",
         "properties": {
@@ -71,15 +106,16 @@
         "title": "Automations",
         "type": "array",
         "orderable": true,
+        "uniqueItemProperties": [ "automationName" ],
         "items": {
           "title": " {{ value.automationName || 'New Automation' }}",
           "type": "object",
           "expandable": true,
           "expanded": false,
-          "uniqueItemProperties": [ "automationName" ],
           "properties": {
             "automationName": {
               "title": "Automation Name",
+              "description": "Unique name for the automation. Do not modify once assigned!",
               "type": "string",
               "required": true
             },
@@ -155,6 +191,26 @@
                       }
                     }
                   ]
+                },
+                "accessoryEvent": {
+                  "title": " ",
+                  "type": "object",
+                  "properties": {
+                    "$ref": "#/$defs/accessory/properties"
+                  },
+                  "condition": {
+                    "functionBody": "return model.automations && model.automations[arrayIndices].trigger.event === 'accessoryevent';"
+                  }
+                },
+                "sensorEvent": {
+                  "title": " ",
+                  "type": "object",
+                  "properties": {
+                    "$ref": "#/$defs/sensor/properties"
+                  },
+                  "condition": {
+                    "functionBody": "return model.automations && model.automations[arrayIndices].trigger.event === 'sensorevent';"
+                  }
                 }
               },
               "allOf": [
@@ -223,5 +279,15 @@
         }
       }
     }
-  }
+  },
+  "uiSchema": {
+  },
+  "form": [
+    {
+      "type": "fieldset",
+      "title": "Platform",
+      "items": []
+    },
+    "*"
+  ]
 }
