@@ -90,42 +90,91 @@
               "expanded": false,
               "properties": {
                 "event": {
-                  "title": "Event",
+                  "title": "Event *",
                   "type": "string",
                   "oneOf": [
-                    { "title": "A Time of Day Occurs", "enum": ["time"] },
-                    { "title": "An Accessory is Controlled", "enum": ["accessory"] },
-                    { "title": "A Sensor Detects Something", "enum": ["sensor"] }
+                    { "title": "A Time of Day Occurs", "enum": ["timeevent"] },
+                    { "title": "An Accessory is Controlled", "enum": ["accessoryevent"] },
+                    { "title": "A Sensor Detects Something", "enum": ["sensorevent"] }
                   ]
                 },
-                "when": {
-                  "title": "When",
-                  "type": "string",
-                  "oneOf": [
-                    { "title": "Sunset", "enum": ["sunset"] },
-                    { "title": "Sunrise", "enum": ["sunset"] },
-                    { "title": "Time of Day", "enum": ["time"] }
-                  ],
-                  "condition": {
-                    "functionBody": "return model.automations[arrayIndices].trigger && model.automations[arrayIndices].trigger.event && model.automations[arrayIndices].trigger.event === 'time';"
-                  }
-                },
-                "repeat": {
-                  "title": "Repeat",
-                  "type": "array",
-                  "uniqueItems": true,
-                  "items": {
-                    "type": "string",
-                    "title": "Option",
-                    "enum": [
-                      "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
-                    ]
+                "timeEvent": {
+                  "title": " ",
+                  "type": "object",
+                  "properties": {
+                    "when": {
+                      "title": "When *",
+                      "type": "string",
+                      "oneOf": [
+                        { "title": "Sunset", "enum": ["sunset"] },
+                        { "title": "Sunrise", "enum": ["sunrise"] },
+                        { "title": "Time of Day", "enum": ["timeofday"] }
+                      ]
+                    },
+                    "time": {
+                      "title": " ",
+                      "type": "object",
+                      "properties": {
+                        "$ref": "#/$defs/time/properties"
+                      },
+                      "condition": {
+                        "functionBody": "return model.automations[arrayIndices].trigger.timeEvent.when === 'timeofday';"
+                      }
+                    },
+                    "repeat": {
+                      "title": "Repeat *",
+                      "type": "array",
+                      "uniqueItems": true,
+                      "items": {
+                        "type": "string",
+                        "title": "Option",
+                        "enum": [
+                          "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
+                        ]
+                      }
+                    }
                   },
                   "condition": {
-                    "functionBody": "return model.automations[arrayIndices].trigger && model.automations[arrayIndices].trigger.event === 'time';"
+                    "functionBody": "return model.automations && model.automations[arrayIndices].trigger.event === 'timeevent';"
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "required": [ "when" ],
+                        "properties": {
+                          "when": { "const": "timeofday" }
+                        }
+                      },
+                      "then": {
+                        "required": [ "time" ],
+                        "properties": {
+                          "time": {
+                            "required": [ "hour", "minutes" ]
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "allOf": [
+                {
+                  "if": {
+                    "required": [ "event" ],
+                    "properties": {
+                      "event": { "const": "timeevent" }
+                    }
+                  },
+                  "then": {
+                    "required": [ "timeEvent" ],
+                    "properties": {
+                      "timeEvent": {
+                        "required": [ "when", "repeat" ]
+                      }
+                    }
                   }
                 }
-              }
+              ]
             },
             "actions": {
               "title": "Actions",
@@ -145,7 +194,6 @@
                 "type": {
                   "title": "Type",
                   "type": "string",
-                  "required": true,
                   "oneOf": [
                     { "title": "Time", "enum": ["time"] },
                     { "title": "Accessory", "enum": ["accesswory"] },
@@ -163,30 +211,10 @@
                 }
               },
               "then": {
-                "required": [ "trigger", "actions" ],
-                "properties": {
-                  "actions": {
-                    "required": [ "accessoryName", "accessoryType", "property", "value" ]
-                  }
-                }
-              }
-            },
-            {
-              "if": {
+                "required": [ "trigger" ],
                 "properties": {
                   "trigger": {
-                    "properties": {
-                      "event": { "const": "time" }
-                    },
                     "required": [ "event" ]
-                  }
-                },
-                "required": [ "trigger" ]
-              },
-              "then": {
-                "properties": {
-                  "trigger": {
-                    "required": [ "event", "when", "repeat" ]
                   }
                 }
               }
